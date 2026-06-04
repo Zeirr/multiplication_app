@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/app_menu_button.dart';
 import 'revision_screen.dart';
-import 'quiz_screen.dart';
-
+import 'quiz_setup_screen.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -16,7 +15,7 @@ class HomeScreen extends StatelessWidget {
   void _goToQuiz(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const QuizScreen()),
+      MaterialPageRoute(builder: (_) => const QuizSetupScreen()),
     );
   }
 

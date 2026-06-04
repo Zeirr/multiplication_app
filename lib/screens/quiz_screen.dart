@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import '../models/multiplication_question.dart';
+import '../models/quiz_answer.dart';
 import '../services/quiz_service.dart';
+import 'result_screen.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key});
+  final List<int> selectedTables;
+  final int numberOfQuestions;
+
+  const QuizScreen({
+    super.key,
+    required this.selectedTables,
+    required this.numberOfQuestions,
+  });
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -13,17 +22,19 @@ class _QuizScreenState extends State<QuizScreen> {
   final QuizService quizService = QuizService();
   final TextEditingController answerController = TextEditingController();
 
-  List<int> selectedTables = [2];
   late MultiplicationQuestion currentQuestion;
 
-  int score = 0;
-  int totalQuestions = 0;
+  final List<QuizAnswer> answers = [];
+
+  bool hasAnswered = false;
   String feedback = '';
+
+  int get currentQuestionNumber => answers.length + 1;
 
   @override
   void initState() {
     super.initState();
-    currentQuestion = quizService.generateQuestion(selectedTables);
+    currentQuestion = quizService.generateQuestion(widget.selectedTables);
   }
 
   @override
@@ -32,48 +43,50 @@ class _QuizScreenState extends State<QuizScreen> {
     super.dispose();
   }
 
-  void toggleTable(int table) {
-    setState(() {
-      if (selectedTables.contains(table)) {
-        if (selectedTables.length > 1) {
-          selectedTables.remove(table);
-        }
-      } else {
-        selectedTables.add(table);
-      }
-
-      nextQuestion();
-    });
-  }
-
   void checkAnswer() {
+    if (hasAnswered) return;
+
     final userAnswer = int.tryParse(answerController.text);
+    final quizAnswer = QuizAnswer(
+      question: currentQuestion,
+      userAnswer: userAnswer,
+    );
 
     setState(() {
-      totalQuestions++;
+      answers.add(quizAnswer);
+      hasAnswered = true;
 
-      if (userAnswer == currentQuestion.answer) {
-        score++;
+      if (quizAnswer.isCorrect) {
         feedback = 'Bonne réponse !';
       } else {
-        feedback = 'Erreur : la bonne réponse était ${currentQuestion.answer}';
+        feedback =
+            'Erreur : ${currentQuestion.label} ${currentQuestion.answer}';
       }
     });
   }
 
   void nextQuestion() {
+    if (!hasAnswered) return;
+
+    if (answers.length >= widget.numberOfQuestions) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => ResultScreen(answers: answers)),
+      );
+      return;
+    }
+
     setState(() {
-      currentQuestion = quizService.generateQuestion(selectedTables);
+      currentQuestion = quizService.generateQuestion(widget.selectedTables);
       answerController.clear();
       feedback = '';
+      hasAnswered = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final successRate = totalQuestions == 0
-        ? 0
-        : ((score / totalQuestions) * 100).round();
+    final progress = answers.length / widget.numberOfQuestions;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Quiz')),
@@ -81,29 +94,22 @@ class _QuizScreenState extends State<QuizScreen> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const Text('Tables à réviser', style: TextStyle(fontSize: 18)),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: List.generate(10, (index) {
-                final table = index + 1;
-
-                return FilterChip(
-                  label: Text('$table'),
-                  selected: selectedTables.contains(table),
-                  onSelected: (_) => toggleTable(table),
-                );
-              }),
+            LinearProgressIndicator(value: progress),
+            const SizedBox(height: 16),
+            Text(
+              'Question $currentQuestionNumber / ${widget.numberOfQuestions}',
+              style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 32),
             Text(
               currentQuestion.label,
-              style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 42, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
             TextField(
               controller: answerController,
+              enabled: !hasAnswered,
+              autofocus: true,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 labelText: 'Ta réponse',
@@ -112,19 +118,33 @@ class _QuizScreenState extends State<QuizScreen> {
               onSubmitted: (_) => checkAnswer(),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: checkAnswer,
-              child: const Text('Valider'),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: hasAnswered ? null : checkAnswer,
+                child: const Text('Valider'),
+              ),
             ),
-            TextButton(
-              onPressed: nextQuestion,
-              child: const Text('Question suivante'),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: OutlinedButton(
+                onPressed: hasAnswered ? nextQuestion : null,
+                child: Text(
+                  answers.length >= widget.numberOfQuestions
+                      ? 'Voir le résultat'
+                      : 'Question suivante',
+                ),
+              ),
             ),
-            const SizedBox(height: 16),
-            Text(feedback, style: const TextStyle(fontSize: 18)),
-            const Spacer(),
-            Text('Score : $score / $totalQuestions'),
-            Text('Réussite : $successRate %'),
+            const SizedBox(height: 24),
+            Text(
+              feedback,
+              style: const TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
