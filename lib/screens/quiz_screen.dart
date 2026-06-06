@@ -3,6 +3,7 @@ import '../models/multiplication_question.dart';
 import '../models/quiz_answer.dart';
 import '../services/quiz_service.dart';
 import 'result_screen.dart';
+import '../widgets/numeric_keyboard.dart';
 
 class QuizScreen extends StatefulWidget {
   final List<int> selectedTables;
@@ -19,8 +20,8 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
+  String currentAnswer = '';
   final QuizService quizService = QuizService();
-  final TextEditingController answerController = TextEditingController();
 
   late MultiplicationQuestion currentQuestion;
 
@@ -31,22 +32,35 @@ class _QuizScreenState extends State<QuizScreen> {
 
   int get currentQuestionNumber => answers.length + 1;
 
+void addNumber(String number) {
+    if (hasAnswered) return;
+
+    setState(() {
+      if (currentAnswer.length < 3) {
+        currentAnswer += number;
+      }
+    });
+  }
+
+  void removeLastNumber() {
+    if (hasAnswered) return;
+
+    setState(() {
+      if (currentAnswer.isNotEmpty) {
+        currentAnswer = currentAnswer.substring(0, currentAnswer.length - 1);
+      }
+    });
+  }
   @override
   void initState() {
     super.initState();
     currentQuestion = quizService.generateQuestion(widget.selectedTables);
   }
 
-  @override
-  void dispose() {
-    answerController.dispose();
-    super.dispose();
-  }
-
   void checkAnswer() {
     if (hasAnswered) return;
 
-    final userAnswer = int.tryParse(answerController.text);
+    final userAnswer = int.tryParse(currentAnswer);
     final quizAnswer = QuizAnswer(
       question: currentQuestion,
       userAnswer: userAnswer,
@@ -78,7 +92,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
     setState(() {
       currentQuestion = quizService.generateQuestion(widget.selectedTables);
-      answerController.clear();
+      currentAnswer = '';
       feedback = '';
       hasAnswered = false;
     });
@@ -106,27 +120,34 @@ class _QuizScreenState extends State<QuizScreen> {
               style: const TextStyle(fontSize: 42, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
-            TextField(
-              controller: answerController,
-              enabled: !hasAnswered,
-              autofocus: true,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Ta réponse',
-                border: OutlineInputBorder(),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                borderRadius: BorderRadius.circular(12),
               ),
-              onSubmitted: (_) => checkAnswer(),
+              child: Text(
+                currentAnswer.isEmpty ? 'Ta réponse' : currentAnswer,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 32,
+                  color: currentAnswer.isEmpty ? Colors.grey : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: hasAnswered ? null : checkAnswer,
-                child: const Text('Valider'),
-              ),
+            NumericKeyboard(
+              onNumberPressed: addNumber,
+              onBackspacePressed: removeLastNumber,
+              onValidatePressed: checkAnswer,
             ),
+
             const SizedBox(height: 8),
+
             SizedBox(
               width: double.infinity,
               height: 52,

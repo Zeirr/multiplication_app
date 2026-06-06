@@ -10,6 +10,7 @@ class QuizSetupScreen extends StatefulWidget {
 
 class _QuizSetupScreenState extends State<QuizSetupScreen> {
   final List<int> selectedTables = [2];
+  int numberOfQuestions = 10;
 
   void toggleTable(int table) {
     setState(() {
@@ -27,8 +28,10 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            QuizScreen(selectedTables: selectedTables, numberOfQuestions: 10),
+        builder: (_) => QuizScreen(
+          selectedTables: List.from(selectedTables),
+          numberOfQuestions: numberOfQuestions,
+        ),
       ),
     );
   }
@@ -48,6 +51,7 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
+
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -61,7 +65,31 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
                 );
               }),
             ),
+
+            const SizedBox(height: 32),
+
+            const Text(
+              'Nombre de questions',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+
+            SegmentedButton<int>(
+              segments: const [
+                ButtonSegment(value: 5, label: Text('5')),
+                ButtonSegment(value: 10, label: Text('10')),
+                ButtonSegment(value: 20, label: Text('20')),
+              ],
+              selected: {numberOfQuestions},
+              onSelectionChanged: (values) {
+                setState(() {
+                  numberOfQuestions = values.first;
+                });
+              },
+            ),
+
             const Spacer(),
+
             SizedBox(
               width: double.infinity,
               height: 56,
