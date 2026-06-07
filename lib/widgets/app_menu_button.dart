@@ -15,12 +15,12 @@ class AppMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 64,
+      height: 70,
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: onPressed,
-        icon: Icon(icon),
-        label: Text(text, style: const TextStyle(fontSize: 18)),
+        icon: Icon(icon, size: 28),
+        label: Text(text, style: const TextStyle(fontSize: 20)),
       ),
     );
   }

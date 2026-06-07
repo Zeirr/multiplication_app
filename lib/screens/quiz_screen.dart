@@ -32,7 +32,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
   int get currentQuestionNumber => answers.length + 1;
 
-void addNumber(String number) {
+  void addNumber(String number) {
     if (hasAnswered) return;
 
     setState(() {
@@ -51,6 +51,7 @@ void addNumber(String number) {
       }
     });
   }
+
   @override
   void initState() {
     super.initState();
@@ -71,10 +72,9 @@ void addNumber(String number) {
       hasAnswered = true;
 
       if (quizAnswer.isCorrect) {
-        feedback = 'Bonne réponse !';
+        feedback = 'Bravo, bonne réponse !';
       } else {
-        feedback =
-            'Erreur : ${currentQuestion.label} ${currentQuestion.answer}';
+        feedback = 'Presque ! La bonne réponse était ${currentQuestion.answer}';
       }
     });
   }
@@ -115,9 +115,28 @@ void addNumber(String number) {
               style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 32),
-            Text(
-              currentQuestion.label,
-              style: const TextStyle(fontSize: 42, fontWeight: FontWeight.bold),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.orange.withValues(alpha: 0.20),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Text(
+                currentQuestion.label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 42,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             Container(
