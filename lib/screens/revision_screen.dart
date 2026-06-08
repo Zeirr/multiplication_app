@@ -19,7 +19,7 @@ class _RevisionScreenState extends State<RevisionScreen> {
         child: Column(
           children: [
             DropdownButtonFormField<int>(
-              value: selectedTable,
+              initialValue: selectedTable,
               decoration: const InputDecoration(
                 labelText: 'Choisir une table',
                 border: OutlineInputBorder(),

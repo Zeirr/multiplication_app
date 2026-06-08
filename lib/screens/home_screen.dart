@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/app_menu_button.dart';
 import 'revision_screen.dart';
 import 'quiz_setup_screen.dart';
+import 'progress_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,6 +30,13 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  void _goToProgress(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProgressScreen()),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -38,8 +46,14 @@ class _HomeScreenState extends State<HomeScreen>
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
 
-    _bounceAnimation = Tween<double>(begin: 0, end: -12).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    _bounceAnimation = Tween<double>(
+      begin: 0,
+      end: -12,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
     );
   }
 
@@ -51,16 +65,21 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 700;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Tables de multiplication')),
+      appBar: AppBar(
+        title: const Text('Tables de multiplication'),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(isSmallScreen ? 16 : 24),
           child: Column(
             children: [
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(18),
+                padding: EdgeInsets.all(isSmallScreen ? 14 : 18),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(32),
@@ -82,41 +101,53 @@ class _HomeScreenState extends State<HomeScreen>
                           child: child,
                         );
                       },
-                      child: Image.asset(
-                        'assets/images/abacus.png',
-                        height: 300,
-                        fit: BoxFit.contain,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: isSmallScreen ? 160 : 240,
+                        ),
+                        child: Image.asset(
+                          'assets/images/abacus.png',
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
+                    SizedBox(height: isSmallScreen ? 10 : 16),
+                    Text(
                       '🌟 Prêt à devenir un champion ? 🌟',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 26,
+                        fontSize: isSmallScreen ? 20 : 26,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    const Text(
+                    SizedBox(height: isSmallScreen ? 6 : 10),
+                    Text(
                       'Révise les tables de multiplication en t’amusant !',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 17),
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 17,
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: isSmallScreen ? 18 : 28),
               AppMenuButton(
                 text: 'Réviser les tables',
                 icon: Icons.menu_book,
                 onPressed: () => _goToRevision(context),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: isSmallScreen ? 10 : 16),
               AppMenuButton(
                 text: 'Mode quiz',
                 icon: Icons.quiz,
                 onPressed: () => _goToQuiz(context),
+              ),
+              SizedBox(height: isSmallScreen ? 10 : 16),
+              AppMenuButton(
+                text: 'Mes progrès',
+                icon: Icons.bar_chart,
+                onPressed: () => _goToProgress(context),
               ),
             ],
           ),

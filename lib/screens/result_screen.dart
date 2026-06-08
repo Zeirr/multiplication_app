@@ -1,17 +1,41 @@
 import 'package:flutter/material.dart';
 import '../models/quiz_answer.dart';
+import '../services/progress_service.dart';
+import 'progress_screen.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   final List<QuizAnswer> answers;
 
   const ResultScreen({super.key, required this.answers});
 
-  int get score => answers.where((answer) => answer.isCorrect).length;
+  @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+void _goToProgress(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => const ProgressScreen()),
+  );
+}
+class _ResultScreenState extends State<ResultScreen> {
+  final ProgressService progressService = ProgressService();
+
+  int get score => widget.answers.where((answer) => answer.isCorrect).length;
+
+  @override
+  void initState() {
+    super.initState();
+    progressService.saveQuizResult(widget.answers);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final wrongAnswers = answers.where((answer) => !answer.isCorrect).toList();
-    final successRate = ((score / answers.length) * 100).round();
+    final wrongAnswers = widget.answers
+        .where((answer) => !answer.isCorrect)
+        .toList();
+
+    final successRate = ((score / widget.answers.length) * 100).round();
 
     return Scaffold(
       appBar: AppBar(
@@ -25,7 +49,7 @@ class ResultScreen extends StatelessWidget {
             const Icon(Icons.emoji_events, size: 96),
             const SizedBox(height: 16),
             Text(
-              '$score / ${answers.length}',
+              '$score / ${widget.answers.length}',
               style: const TextStyle(fontSize: 42, fontWeight: FontWeight.bold),
             ),
             Text(
@@ -35,7 +59,7 @@ class ResultScreen extends StatelessWidget {
             const SizedBox(height: 32),
             if (wrongAnswers.isEmpty)
               const Text(
-                'Bravo, aucune erreur !',
+                '🎉 Bravo, aucune erreur !',
                 style: TextStyle(fontSize: 20),
               )
             else ...[

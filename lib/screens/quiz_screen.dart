@@ -72,9 +72,16 @@ class _QuizScreenState extends State<QuizScreen> {
       hasAnswered = true;
 
       if (quizAnswer.isCorrect) {
-        feedback = 'Bravo, bonne réponse !';
+        feedback = '🎉 Bravo, bonne réponse !';
+
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          if (mounted) {
+            nextQuestion();
+          }
+        });
       } else {
-        feedback = 'Presque ! La bonne réponse était ${currentQuestion.answer}';
+        feedback =
+            '💪 Presque ! La bonne réponse était ${currentQuestion.answer}';
       }
     });
   }
