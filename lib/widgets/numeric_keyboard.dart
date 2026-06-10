@@ -43,9 +43,9 @@ class NumericKeyboard extends StatelessWidget {
   Widget _buildNumberButton(String number) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.all(6),
+        padding: const EdgeInsets.all(4),
         child: SizedBox(
-          height: 58,
+          height: 46,
           child: ElevatedButton(
             onPressed: () => onNumberPressed(number),
             child: Text(number, style: const TextStyle(fontSize: 24)),
@@ -61,9 +61,9 @@ class NumericKeyboard extends StatelessWidget {
   }) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.all(6),
+        padding: const EdgeInsets.all(4),
         child: SizedBox(
-          height: 58,
+          height: 46,
           child: ElevatedButton(onPressed: onPressed, child: Icon(icon)),
         ),
       ),

@@ -111,10 +111,11 @@ class _QuizScreenState extends State<QuizScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Quiz')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
+      body: SafeArea(
+  child: SingleChildScrollView(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      children: [
             LinearProgressIndicator(value: progress),
             const SizedBox(height: 16),
             Text(
@@ -195,6 +196,7 @@ class _QuizScreenState extends State<QuizScreen> {
           ],
         ),
       ),
+    )
     );
   }
 }
