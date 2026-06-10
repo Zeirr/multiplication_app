@@ -72,7 +72,7 @@ class _QuizScreenState extends State<QuizScreen> {
       hasAnswered = true;
 
       if (quizAnswer.isCorrect) {
-        feedback = '🎉 Bravo, bonne réponse !';
+        showFeedbackPopup(message: '🎉 Bravo !', isSuccess: true);
 
         Future.delayed(const Duration(milliseconds: 1000), () {
           if (mounted) {
@@ -80,8 +80,10 @@ class _QuizScreenState extends State<QuizScreen> {
           }
         });
       } else {
-        feedback =
-            '💪 Presque ! La bonne réponse était ${currentQuestion.answer}';
+        showFeedbackPopup(
+          message: '💪 Presque ! Réponse : ${currentQuestion.answer}',
+          isSuccess: false,
+        );
       }
     });
   }
@@ -105,6 +107,30 @@ class _QuizScreenState extends State<QuizScreen> {
     });
   }
 
+  void showFeedbackPopup({required String message, required bool isSuccess}) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: isSuccess ? Colors.green : Colors.redAccent,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 80,
+          bottom: 520,
+        ),
+        duration: const Duration(milliseconds: 900),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final progress = answers.length / widget.numberOfQuestions;
@@ -112,91 +138,86 @@ class _QuizScreenState extends State<QuizScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Quiz')),
       body: SafeArea(
-  child: SingleChildScrollView(
-    padding: const EdgeInsets.all(16),
-    child: Column(
-      children: [
-            LinearProgressIndicator(value: progress),
-            const SizedBox(height: 16),
-            Text(
-              'Question $currentQuestionNumber / ${widget.numberOfQuestions}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 32),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.orange.withValues(alpha: 0.20),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              LinearProgressIndicator(value: progress),
+              const SizedBox(height: 16),
+              Text(
+                'Question $currentQuestionNumber / ${widget.numberOfQuestions}',
+                style: const TextStyle(fontSize: 18),
               ),
-              child: Text(
-                currentQuestion.label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 42,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(height: 32),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.withValues(alpha: 0.20),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                currentAnswer.isEmpty ? 'Ta réponse' : currentAnswer,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 32,
-                  color: currentAnswer.isEmpty ? Colors.grey : Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            NumericKeyboard(
-              onNumberPressed: addNumber,
-              onBackspacePressed: removeLastNumber,
-              onValidatePressed: checkAnswer,
-            ),
-
-            const SizedBox(height: 8),
-
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: OutlinedButton(
-                onPressed: hasAnswered ? nextQuestion : null,
                 child: Text(
-                  answers.length >= widget.numberOfQuestions
-                      ? 'Voir le résultat'
-                      : 'Question suivante',
+                  currentQuestion.label,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 42,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              feedback,
-              style: const TextStyle(fontSize: 18),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(height: 24),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  currentAnswer.isEmpty ? 'Ta réponse' : currentAnswer,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32,
+                    color: currentAnswer.isEmpty ? Colors.grey : Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              NumericKeyboard(
+                onNumberPressed: addNumber,
+                onBackspacePressed: removeLastNumber,
+                onValidatePressed: checkAnswer,
+              ),
+
+              const SizedBox(height: 8),
+
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton(
+                  onPressed: hasAnswered ? nextQuestion : null,
+                  child: Text(
+                    answers.length >= widget.numberOfQuestions
+                        ? 'Voir le résultat'
+                        : 'Question suivante',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
-    )
     );
   }
 }
