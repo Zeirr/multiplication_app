@@ -4,10 +4,22 @@ import '../models/multiplication_question.dart';
 class QuizService {
   final Random _random = Random();
 
-  MultiplicationQuestion generateQuestion(List<int> selectedTables) {
-    final table = selectedTables[_random.nextInt(selectedTables.length)];
-    final multiplier = _random.nextInt(10) + 1;
+  List<MultiplicationQuestion> generateUniqueQuestions({
+    required List<int> selectedTables,
+    required int numberOfQuestions,
+  }) {
+    final allQuestions = <MultiplicationQuestion>[];
 
-    return MultiplicationQuestion(table: table, multiplier: multiplier);
+    for (final table in selectedTables) {
+      for (int multiplier = 1; multiplier <= 10; multiplier++) {
+        allQuestions.add(
+          MultiplicationQuestion(table: table, multiplier: multiplier),
+        );
+      }
+    }
+
+    allQuestions.shuffle(_random);
+
+    return allQuestions.take(numberOfQuestions).toList();
   }
 }

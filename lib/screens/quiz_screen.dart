@@ -22,7 +22,7 @@ class QuizScreen extends StatefulWidget {
 class _QuizScreenState extends State<QuizScreen> {
   String currentAnswer = '';
   final QuizService quizService = QuizService();
-
+  late List<MultiplicationQuestion> questions;
   late MultiplicationQuestion currentQuestion;
 
   final List<QuizAnswer> answers = [];
@@ -55,7 +55,13 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
-    currentQuestion = quizService.generateQuestion(widget.selectedTables);
+
+    questions = quizService.generateUniqueQuestions(
+      selectedTables: widget.selectedTables,
+      numberOfQuestions: widget.numberOfQuestions,
+    );
+
+    currentQuestion = questions.first;
   }
 
   void checkAnswer() {
@@ -101,7 +107,7 @@ class _QuizScreenState extends State<QuizScreen> {
     }
 
     setState(() {
-      currentQuestion = quizService.generateQuestion(widget.selectedTables);
+      currentQuestion = questions[answers.length];
       currentAnswer = '';
       feedback = '';
       hasAnswered = false;
