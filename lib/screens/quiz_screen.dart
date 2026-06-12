@@ -62,6 +62,7 @@ class _QuizScreenState extends State<QuizScreen> {
     if (hasAnswered) return;
 
     final userAnswer = int.tryParse(currentAnswer);
+
     final quizAnswer = QuizAnswer(
       question: currentQuestion,
       userAnswer: userAnswer,
@@ -70,20 +71,20 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       answers.add(quizAnswer);
       hasAnswered = true;
+    });
 
-      if (quizAnswer.isCorrect) {
-        showFeedbackPopup(message: '🎉 Bravo !', isSuccess: true);
+    if (quizAnswer.isCorrect) {
+      showFeedbackPopup(message: '🎉 Bravo !', isSuccess: true);
+    } else {
+      showFeedbackPopup(
+        message: '💪 Presque ! Réponse : ${currentQuestion.answer}',
+        isSuccess: false,
+      );
+    }
 
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          if (mounted) {
-            nextQuestion();
-          }
-        });
-      } else {
-        showFeedbackPopup(
-          message: '💪 Presque ! Réponse : ${currentQuestion.answer}',
-          isSuccess: false,
-        );
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (mounted) {
+        nextQuestion();
       }
     });
   }
