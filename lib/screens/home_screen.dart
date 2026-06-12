@@ -113,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                     SizedBox(height: isSmallScreen ? 10 : 16),
                     Text(
-                      '🌟 Prêt à devenir un champion ? 🌟',
+                      '🌟 Prêt à devenir un champion ou une championne ? 🌟',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: isSmallScreen ? 20 : 26,

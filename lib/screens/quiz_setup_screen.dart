@@ -25,11 +25,20 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
   }
 
   void startQuiz() {
+    if (numberOfQuestions == 20 && selectedTables.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('⚠️ Pour 20 questions, sélectionne au moins 2 tables.'),
+        ),
+      );
+      return;
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => QuizScreen(
-          selectedTables: List.from(selectedTables),
+          selectedTables: selectedTables,
           numberOfQuestions: numberOfQuestions,
         ),
       ),
@@ -87,6 +96,18 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
                 });
               },
             ),
+            if (numberOfQuestions == 20 && selectedTables.length < 2)
+              const Padding(
+                padding: EdgeInsets.only(top: 12),
+                child: Text(
+                  '⚠️ Sélectionne au moins 2 tables pour un quiz de 20 questions.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
 
             const Spacer(),
 
@@ -94,7 +115,10 @@ class _QuizSetupScreenState extends State<QuizSetupScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton.icon(
-                onPressed: startQuiz,
+                onPressed:
+                    (numberOfQuestions == 20 && selectedTables.length < 2)
+                    ? null
+                    : startQuiz,
                 icon: const Icon(Icons.play_arrow),
                 label: const Text(
                   'Démarrer le quiz',
